@@ -1,4 +1,4 @@
-$ErrorActionPreference = 'Stop'
+﻿$ErrorActionPreference = 'Stop'
 $basePath = $PSScriptRoot
 $manifest = Get-Content -LiteralPath (Join-Path $basePath 'portable-parts.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 $destinationPath = Join-Path $basePath $manifest.folder
@@ -22,6 +22,12 @@ try {
 } finally { $targetStream.Dispose() }
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 Write-Host 'Extracting portable application...'
-[IO.Compression.ZipFile]::ExtractToDirectory($archivePath,$basePath)
+$nativeTar = Join-Path $env:WINDIR 'System32/tar.exe'
+if (Test-Path -LiteralPath $nativeTar) {
+    & $nativeTar -xf $archivePath -C $basePath
+    if ($LASTEXITCODE -ne 0) { throw "Windows tar extraction failed: $LASTEXITCODE" }
+} else {
+    [IO.Compression.ZipFile]::ExtractToDirectory($archivePath,$basePath)
+}
 Write-Host "Ready: $destinationPath\RedReaderStudio.exe"
 Write-Host 'The combined ZIP and downloaded parts may be removed after checking the application.'
