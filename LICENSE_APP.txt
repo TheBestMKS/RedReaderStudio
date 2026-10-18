@@ -1,0 +1,2 @@
+Higgs Reader application wrapper source in this generated package is provided without warranty.
+Third-party dependencies and model weights retain their own licenses. In particular, Higgs Audio v3 model weights are not relicensed by this application wrapper.
